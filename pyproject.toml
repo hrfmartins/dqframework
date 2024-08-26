@@ -1,0 +1,10 @@
+[project]
+name = "dqframework"
+version = "0.0.1"
+authors = [
+    { name = "Hugo Martins", email = "hrfmartins@gmail.com" },
+]
+description = "A dq framework"
+readme = "README.md"
+requires-python = ">=3.8"
+
