@@ -1,6 +1,6 @@
 import polars as pl
 
-from dqframework.validators.has_min import has_min
+from dqframework.validators import has_min
 
 
 def test_is_min():

@@ -3,7 +3,7 @@ from datetime import timedelta
 import polars as pl
 
 from dqframework.pipeline import Pipeline, Check
-from dqframework.validators.has_min import has_min
+from dqframework.validators import has_min
 
 
 def test_pipeline_results():
