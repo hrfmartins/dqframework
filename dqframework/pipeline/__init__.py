@@ -6,20 +6,21 @@ from typing import List
 
 import polars as pl
 
-columns = {
-    "id": int,
-    "timestamp": str,
-    "check": str,
-    "level": str,
-    "column": str,
-    "rule": str,
-    "value": float,
-    "rows": int,
-    "violations": int,
-    "pass_rate": float,
-    "pass_threshold": float,
-    "status": str,
-}
+columns = [
+    "id"
+    "check_id"
+    "timestamp"
+    "check"
+    "level"
+    "column"
+    "rule"
+    "value"
+    "rows"
+    "violations"
+    "pass_rate"
+    "pass_threshold"
+    "status"
+]
 
 
 class Check:
@@ -94,10 +95,9 @@ class Check:
         value_check: str = "",
         validation_id: str = "",
     ) -> pl.DataFrame:
-
         rows = original_df.height
         violations = incorrect_df.height
-        pass_rate = float((rows - violations) / rows)
+        pass_rate = float((rows - violations) / rows) if rows > 0 else 0.0
         return pl.DataFrame(
             {
                 "id": [validation_id],

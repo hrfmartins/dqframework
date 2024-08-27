@@ -95,3 +95,18 @@ def test_pipeline_with_multiple_checks_with_multiple_validations():
     assert results["status"][2] == "PASS"
     assert results["status"][3] == "PASS"
     assert results["status"][4] == "FAIL"  # Name A is not valid
+
+
+def test_pipeline_div_by_zero():
+    # If records run out before pipeline ends, we should not divide by zero and so it should be 0 on the pass rate
+    check1 = Check(Check.Level.INFO, "Has Minimum Value 1")
+    check1.validations.append([has_min, "a", 10])
+
+    check2 = Check(Check.Level.INFO, "Has Minimum Value 1")
+    check2.validations.append([has_min, "a", 0])
+
+    pipeline = Pipeline(checks=[check1, check2])
+    pipeline_results = pipeline.execute(pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]}))
+
+    assert pipeline_results.invalid_records.height == 3
+    assert pipeline_results.results["pass_rate"].to_list() == [0.0, 0.0]
