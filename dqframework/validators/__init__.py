@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import polars as pl
 
 
@@ -201,5 +203,38 @@ def is_composite_key(df: pl.DataFrame, columns: list) -> (pl.DataFrame, pl.DataF
 
     correct = df.filter(df.select(columns).is_unique())
     incorrect = df.filter(~df.select(columns).is_unique())
+
+    return correct, incorrect
+
+
+def no_future_dates(df: pl.DataFrame, column: str, date: datetime = datetime.today()):
+    """
+    Check if a DataFrame column has no future dates
+
+    :param df: Dataframe
+    :param column: name of the column to check
+    :param date: datetime.datetime (default is right now)
+    :return: (pl.DataFrame, pl.DataFrame) - correct, incorrect
+    """
+
+    correct = df.filter(pl.col(column) <= pl.lit(datetime.now()))
+    incorrect = df.filter(pl.col(column) > pl.lit(datetime.now()))
+
+    return correct, incorrect
+
+
+def is_in(df: pl.DataFrame, column: str, values: list) -> (pl.DataFrame, pl.DataFrame):
+    """
+    Check if a DataFrame column has values in a list
+
+    Parameters
+    :param df: DataFrame
+    :param column: name of the column to check
+    :param values: list of values to check
+    :return: (pl.DataFrame, pl.DataFrame) - correct, incorrect
+    """
+
+    correct = df.filter(pl.col(column).is_in(values))
+    incorrect = df.filter(~pl.col(column).is_in(values))
 
     return correct, incorrect
