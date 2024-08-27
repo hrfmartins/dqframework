@@ -20,6 +20,9 @@ jobs:
         # run test.yaml
         runs-on: ubuntu-latest
         steps:
+            -   name: Check out repository
+                uses: actions/checkout@v3
+
             -   name: Run Tests
                 uses: ./.github/actions/test.yaml
     deploy:
