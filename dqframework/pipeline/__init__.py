@@ -37,7 +37,7 @@ class Check:
         self.check_name: str = check_name
         self.validations = []
         self.pass_threshold = pass_threshold
-        self.check_id = uuid.uuid4()
+        self.check_id = str(uuid.uuid4())
 
     def __call__(
         self, df: pl.DataFrame, *args, **kwargs
@@ -49,7 +49,7 @@ class Check:
 
         dq_metrics = pl.DataFrame()
         for validation in self.validations:
-            val_id = uuid.uuid4()
+            val_id = str(uuid.uuid4())
             (rule, column, value) = validation
 
             correct, incorrect = rule(df, *validation[1:])
@@ -95,7 +95,7 @@ class Check:
 
         rows = original_df.height
         violations = incorrect_df.height
-        pass_rate = (rows - violations) / rows
+        pass_rate = float((rows - violations) / rows)
         return pl.DataFrame(
             {
                 "id": [validation_id],
@@ -109,15 +109,21 @@ class Check:
                 "rows": [rows],
                 "violations": [violations],
                 "pass_rate": [pass_rate],
-                "pass_threshold": [self.pass_threshold],
+                "pass_threshold": [float(self.pass_threshold)],
                 "status": ["PASS" if pass_rate >= self.pass_threshold else "FAIL"],
             }
         )
 
 
 class Pipeline:
+    class Status(enum.Enum):
+        NOT_EXECUTED = "NOT_EXECUTED"
+        EXECUTED = "EXECUTED"
+
     def __init__(self, checks: List[Check]):
         self.checks = checks
+        self.results = None
+        self.status = Pipeline.Status.NOT_EXECUTED
 
     def execute(self, df: pl.DataFrame):
         if not self.checks:
@@ -133,4 +139,25 @@ class Pipeline:
             results_df = pl.concat([results_df, results], how="vertical")
             aux_df = ok
 
+        self.results = results_df
+        self.status = Pipeline.Status.EXECUTED
+
         return aux_df, invalid_records, results_df
+
+    def results_to_csv(self, path: str):
+        if self.status == Pipeline.Status.NOT_EXECUTED:
+            raise ValueError("Pipeline not executed")
+
+        self.results.write_csv(path)
+
+    def results_to_xlsx(self, path: str):
+        if self.status == Pipeline.Status.NOT_EXECUTED:
+            raise ValueError("Pipeline not executed")
+
+        self.results.write_excel(path)
+
+    def results_to_json(self, path: str):
+        if self.status == Pipeline.Status.NOT_EXECUTED:
+            raise ValueError("Pipeline not executed")
+
+        self.results.write_json(path)
