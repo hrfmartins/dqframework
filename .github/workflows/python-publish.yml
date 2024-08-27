@@ -18,7 +18,7 @@ permissions:
 jobs:
     test:
         # run test.yaml
-        uses: hrfmartins/dqframework/.github/workflows/test.yml@main
+        uses: ./.github/workflows/test.yml@main
 
     deploy:
         runs-on: ubuntu-latest
