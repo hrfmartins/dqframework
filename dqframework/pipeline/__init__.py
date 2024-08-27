@@ -50,7 +50,8 @@ class Check:
         dq_metrics = pl.DataFrame()
         for validation in self.validations:
             val_id = str(uuid.uuid4())
-            (rule, column, value) = validation
+            rule = validation[0]
+            column = validation[1]
 
             correct, incorrect = rule(df, *validation[1:])
             correct_acc = pl.concat([correct_acc, correct], how="vertical")
@@ -71,7 +72,7 @@ class Check:
                         incorrect,
                         column,
                         rule.__name__,
-                        str(value),
+                        str(*validation[2:]),
                         str(val_id),
                     ),
                 ]
