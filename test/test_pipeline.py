@@ -87,12 +87,11 @@ def test_pipeline_with_multiple_checks_with_multiple_validations():
     )
 
     results = pipeline_results.results
-    pipeline_results.results.write_json("results.json")
-    pipeline_results.invalid_records.write_json("invalids.json")
 
-    assert results.height == 2
-    assert pipeline_results.invalid_records == 2
-    assert results.select(
-        results.filter(pl.col("check") == "Minimum of cards collected is 1")["status"]
-    ).to_dicts() == ["FAIL"]
-    assert results["status"][1] == "PASS"
+    assert results.height == len(check1.validations) + len(check2.validations)
+    assert pipeline_results.invalid_records.height == 2
+    assert results["status"][0] == "PASS"
+    assert results["status"][1] == "FAIL"  # Cards collected has a 0
+    assert results["status"][2] == "PASS"
+    assert results["status"][3] == "PASS"
+    assert results["status"][4] == "FAIL"  # Name A is not valid
