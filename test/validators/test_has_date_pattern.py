@@ -11,12 +11,12 @@ def test_has_date_pattern():
 
     pipeline.checks += [check1]
 
-    (valid, invalid, result) = pipeline.execute(
+    pipeline_results = pipeline.execute(
         pl.DataFrame({"a": ["2021-01-01", "2021-02-01", "2021-03-01"], "b": [4, 5, 6]})
     )
 
-    assert valid.height == 3
-    assert invalid.height == 0
+    assert pipeline_results.valid_records.height == 3
+    assert pipeline_results.invalid_records.height == 0
 
 
 def test_has_two_invalids():
@@ -26,7 +26,7 @@ def test_has_two_invalids():
 
     pipeline.checks += [check1]
 
-    (valid, invalid, result) = pipeline.execute(
+    pipeline_results = pipeline.execute(
         pl.DataFrame(
             {
                 "a": [
@@ -39,6 +39,9 @@ def test_has_two_invalids():
         )
     )
 
-    assert valid.height == 1
-    assert invalid.height == 2
-    assert invalid["a"].to_list() == ["02-2022-01", "2021-13-13"]
+    assert pipeline_results.valid_records.height == 1
+    assert pipeline_results.invalid_records.height == 2
+    assert pipeline_results.invalid_records["a"].to_list() == [
+        "02-2022-01",
+        "2021-13-13",
+    ]

@@ -1,5 +1,6 @@
 import enum
 import uuid
+from dataclasses import dataclass
 from datetime import datetime
 from typing import List
 
@@ -143,7 +144,7 @@ class Pipeline:
         self.results = results_df
         self.status = Pipeline.Status.EXECUTED
 
-        return aux_df, invalid_records, results_df
+        return PipelineResults(aux_df, invalid_records, results_df)
 
     def results_to_csv(self, path: str):
         if self.status == Pipeline.Status.NOT_EXECUTED:
@@ -162,3 +163,10 @@ class Pipeline:
             raise ValueError("Pipeline not executed")
 
         self.results.write_json(path)
+
+
+@dataclass
+class PipelineResults:
+    valid_records: pl.DataFrame
+    invalid_records: pl.DataFrame
+    results: pl.DataFrame

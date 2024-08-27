@@ -13,15 +13,13 @@ def test_pipeline_results():
 
     pipeline.checks += [check1]
 
-    (valid, invalid, results) = pipeline.execute(
-        pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
-    )
+    pipeline_results = pipeline.execute(pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]}))
 
-    assert results.height == len(pipeline.checks)
-    assert results["pass_rate"][0] == 2 / 3
-    assert results["status"][0] == "FAIL"
-    assert results["violations"][0] == 1
-    assert results["level"][0] == "INFO"
+    assert pipeline_results.results.height == len(pipeline.checks)
+    assert pipeline_results.results["pass_rate"][0] == 2 / 3
+    assert pipeline_results.results["status"][0] == "FAIL"
+    assert pipeline_results.results["violations"][0] == 1
+    assert pipeline_results.results["level"][0] == "INFO"
 
 
 def test_pipeline_results_with_warning_error():
@@ -30,15 +28,13 @@ def test_pipeline_results_with_warning_error():
 
     pipeline = Pipeline([check1])
 
-    (valid, invalid, results) = pipeline.execute(
-        pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
-    )
+    pipeline_results = pipeline.execute(pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]}))
 
-    assert results.height == len(pipeline.checks)
-    assert results["pass_rate"][0] == 2 / 3
-    assert results["status"][0] == "FAIL"
-    assert results["violations"][0] == 1
-    assert results["level"][0] == "WARNING"
+    assert pipeline_results.results.height == len(pipeline.checks)
+    assert pipeline_results.results["pass_rate"][0] == 2 / 3
+    assert pipeline_results.results["status"][0] == "FAIL"
+    assert pipeline_results.results["violations"][0] == 1
+    assert pipeline_results.results["level"][0] == "WARNING"
 
 
 def test_pipeline_results_attributes():
@@ -47,23 +43,21 @@ def test_pipeline_results_attributes():
 
     pipeline = Pipeline([check1])
 
-    (valid, invalid, results) = pipeline.execute(
-        pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
-    )
+    pipeline_results = pipeline.execute(pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]}))
 
-    assert results["check_id"][0] != ""
-    assert results["id"][0] != ""
+    assert pipeline_results.results["check_id"][0] != ""
+    assert pipeline_results.results["id"][0] != ""
     # timestamp is within a 10 sec range
-    assert results["timestamp"][0] - timedelta(seconds=1)
+    assert pipeline_results.results["timestamp"][0] - timedelta(seconds=1)
 
-    assert results["check"][0] == "Has Minimum Value 2"
-    assert results["column"][0] == "a"
-    assert results["rule"][0] == "has_min"
-    assert results["value"][0] == "2"
-    assert results["rows"][0] == 3
-    assert results["violations"][0] == 1
-    assert results["pass_rate"][0] == 2 / 3
-    assert results["pass_threshold"][0] == 0.9
+    assert pipeline_results.results["check"][0] == "Has Minimum Value 2"
+    assert pipeline_results.results["column"][0] == "a"
+    assert pipeline_results.results["rule"][0] == "has_min"
+    assert pipeline_results.results["value"][0] == "2"
+    assert pipeline_results.results["rows"][0] == 3
+    assert pipeline_results.results["violations"][0] == 1
+    assert pipeline_results.results["pass_rate"][0] == 2 / 3
+    assert pipeline_results.results["pass_threshold"][0] == 0.9
 
 
 def test_pipeline_with_custom_threshold():
@@ -72,11 +66,9 @@ def test_pipeline_with_custom_threshold():
 
     pipeline = Pipeline([check1])
 
-    (valid, invalid, results) = pipeline.execute(
-        pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
-    )
+    pipeline_results = pipeline.execute(pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]}))
 
-    assert results["status"][0] == "PASS"
+    assert pipeline_results.results["status"][0] == "PASS"
 
 
 def test_pipeline_with_custom_threshold_and_fails():
@@ -85,11 +77,9 @@ def test_pipeline_with_custom_threshold_and_fails():
 
     pipeline = Pipeline([check1])
 
-    (valid, invalid, results) = pipeline.execute(
-        pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
-    )
+    pipeline_results = pipeline.execute(pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]}))
 
-    assert results["status"][0] == "FAIL"
+    assert pipeline_results.results["status"][0] == "FAIL"
 
 
 def test_pipeline_check_with_multiple_validations():
@@ -99,9 +89,9 @@ def test_pipeline_check_with_multiple_validations():
 
     pipeline = Pipeline([check1])
 
-    (valid, invalid, results) = pipeline.execute(
-        pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
-    )
+    pipeline_results = pipeline.execute(pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]}))
+
+    results = pipeline_results.results
 
     assert results.height == 2
     assert results["status"][0] == "FAIL"

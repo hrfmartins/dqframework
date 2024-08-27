@@ -11,11 +11,9 @@ def test_pipeline_with_checks():
 
     pipeline.checks += [check1]
 
-    (valid, invalid, results) = pipeline.execute(
-        pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
-    )
+    pipeline_results = pipeline.execute(pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]}))
 
-    assert valid.height == 2
+    assert pipeline_results.valid_records.height == 2
 
 
 def test_pipeline_with_multiple_checks():
@@ -25,12 +23,10 @@ def test_pipeline_with_multiple_checks():
     check2.validations.append([has_min, "a", 1])
 
     pipeline = Pipeline(checks=[check1, check2])
-    (valid, invalid, results) = pipeline.execute(
-        pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
-    )
+    pipeline_results = pipeline.execute(pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]}))
 
-    assert valid.height == 2
-    assert invalid.height == 1
+    assert pipeline_results.valid_records.height == 2
+    assert pipeline_results.invalid_records.height == 1
 
 
 def test_pipeline_with_no_checks():
@@ -54,19 +50,15 @@ def test_pipeline_with_no_filtered_records():
     check1 = Check(Check.Level.INFO, "Has Minimum Value 2")
     check1.validations.append([has_min, "a", 0])
     pipeline = Pipeline(checks=[check1])
-    (valid, invalid, results) = pipeline.execute(
-        pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
-    )
-    assert valid.height == 3
-    assert invalid.height == 0
+    pipeline_results = pipeline.execute(pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]}))
+    assert pipeline_results.valid_records.height == 3
+    assert pipeline_results.invalid_records.height == 0
 
 
 def test_pipeline_with_all_incorrect_records():
     check1 = Check(Check.Level.INFO, "Has Minimum Value 2")
     check1.validations.append([has_min, "a", 4])
     pipeline = Pipeline(checks=[check1])
-    (valid, invalid, results) = pipeline.execute(
-        pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
-    )
-    assert valid.height == 0
-    assert invalid.height == 3
+    pipeline_results = pipeline.execute(pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]}))
+    assert pipeline_results.valid_records.height == 0
+    assert pipeline_results.invalid_records.height == 3
