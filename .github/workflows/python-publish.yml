@@ -18,13 +18,7 @@ permissions:
 jobs:
     test:
         # run test.yaml
-        runs-on: ubuntu-latest
-        steps:
-            -   name: Check out repository
-                uses: actions/checkout@v3
-
-            -   name: Run Tests
-                uses: hrfmartins/dqframework/.github/workflows/test.yml@main
+        uses: hrfmartins/dqframework/.github/workflows/test.yml@main
 
     deploy:
         runs-on: ubuntu-latest
