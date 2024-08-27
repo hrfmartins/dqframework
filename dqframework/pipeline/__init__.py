@@ -55,7 +55,7 @@ class Check:
             column = validation[1]
 
             correct, incorrect = rule(df, *validation[1:])
-            correct_acc = pl.concat([correct_acc, correct], how="vertical")
+            correct_acc = correct
 
             # tag the incorrect with the check_id that failed
             incorrect = incorrect.with_columns(
