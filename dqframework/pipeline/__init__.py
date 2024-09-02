@@ -46,7 +46,7 @@ class Check:
     ) -> (pl.DataFrame, pl.DataFrame, pl.DataFrame):
         if not self.validations:
             raise ValueError("No validations added to the check")
-        correct_acc = pl.DataFrame()
+        correct_acc = df
         incorrect_acc = pl.DataFrame()
 
         dq_metrics = pl.DataFrame()
@@ -55,7 +55,7 @@ class Check:
             rule = validation[0]
             column = validation[1]
 
-            correct, incorrect = rule(df, *validation[1:])
+            correct, incorrect = rule(correct_acc, *validation[1:])
             correct_acc = correct
 
             # tag the incorrect with the check_id that failed
