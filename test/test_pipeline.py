@@ -1,13 +1,13 @@
 import polars as pl
 
 from dqframework.pipeline import Pipeline, Check
-from dqframework.validators import has_min, is_complete, has_string_pattern
+from dqframework.validators import HasMin, IsComplete, HasStrPattern
 
 
 def test_pipeline_with_checks():
     pipeline = Pipeline(checks=[])
     check1 = Check(Check.Level.INFO, "Has Minimum Value 2")
-    check1.validations.append([has_min, "a", 2])
+    check1.validations.append(HasMin("a", 2))
 
     pipeline.checks += [check1]
 
@@ -18,9 +18,9 @@ def test_pipeline_with_checks():
 
 def test_pipeline_with_multiple_checks():
     check1 = Check(Check.Level.INFO, "Has Minimum Value 2")
-    check1.validations.append([has_min, "a", 2])
+    check1.validations.append(HasMin("a", 2))
     check2 = Check(Check.Level.INFO, "Has Minimum Value 1")
-    check2.validations.append([has_min, "a", 1])
+    check2.validations.append(HasMin("a", 1))
 
     pipeline = Pipeline(checks=[check1, check2])
     pipeline_results = pipeline.execute(pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]}))
@@ -48,7 +48,7 @@ def test_check_with_no_validations():
 
 def test_pipeline_with_no_filtered_records():
     check1 = Check(Check.Level.INFO, "Has Minimum Value 2")
-    check1.validations.append([has_min, "a", 0])
+    check1.validations.append(HasMin("a", 0))
     pipeline = Pipeline(checks=[check1])
     pipeline_results = pipeline.execute(pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]}))
     assert pipeline_results.valid_records.height == 3
@@ -57,7 +57,7 @@ def test_pipeline_with_no_filtered_records():
 
 def test_pipeline_with_all_incorrect_records():
     check1 = Check(Check.Level.INFO, "Has Minimum Value 2")
-    check1.validations.append([has_min, "a", 4])
+    check1.validations.append(HasMin("a", 4))
     pipeline = Pipeline(checks=[check1])
     pipeline_results = pipeline.execute(pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]}))
     assert pipeline_results.valid_records.height == 0
@@ -66,13 +66,13 @@ def test_pipeline_with_all_incorrect_records():
 
 def test_pipeline_with_multiple_checks_with_multiple_validations():
     check1 = Check(Check.Level.INFO, "Minimum of cards and age is 1")
-    check1.validations.append([is_complete, "Cards_Collected"])
-    check1.validations.append([has_min, "Cards_Collected", 1])
-    check1.validations.append([has_min, "Age", 1])
+    check1.validations.append(IsComplete("Cards_Collected"))
+    check1.validations.append(HasMin("Cards_Collected", 1))
+    check1.validations.append(HasMin("Age", 1))
 
     check2 = Check(Check.Level.INFO, "All names are valid")
-    check2.validations.append([is_complete, "Name"])
-    check2.validations.append([has_string_pattern, "Name", "\w{3,20}"])
+    check2.validations.append(IsComplete("Name"))
+    check2.validations.append(HasStrPattern("Name", "\w{3,20}"))
 
     pipeline = Pipeline([check1, check2])
 
@@ -100,10 +100,10 @@ def test_pipeline_with_multiple_checks_with_multiple_validations():
 def test_pipeline_div_by_zero():
     # If records run out before pipeline ends, we should not divide by zero and so it should be 0 on the pass rate
     check1 = Check(Check.Level.INFO, "Has Minimum Value 1")
-    check1.validations.append([has_min, "a", 10])
+    check1.validations.append(HasMin("a", 10))
 
     check2 = Check(Check.Level.INFO, "Has Minimum Value 1")
-    check2.validations.append([has_min, "a", 0])
+    check2.validations.append(HasMin("a", 0))
 
     pipeline = Pipeline(checks=[check1, check2])
     pipeline_results = pipeline.execute(pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]}))

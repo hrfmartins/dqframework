@@ -1,7 +1,7 @@
 import polars as pl
 
 from dqframework.pipeline import Pipeline, Check
-from dqframework.validators import has_string_pattern
+from dqframework.validators import HasStrPattern
 
 if __name__ == "__main__":
     # Create a dataframe
@@ -14,11 +14,11 @@ if __name__ == "__main__":
 
     # Check #1
     check1 = Check(Check.Level.ERROR, "Job starts with Data or Business", 1.0)
-    check1.validations.append([has_string_pattern, "Job", r"(Data \w+)|(Business \w+)"])
+    check1.validations.append(HasStrPattern("Job", r"(Data \w+)|(Business \w+)"))
 
     # Check 2
     check2 = Check(Check.Level.INFO, "Name starts with A")
-    check2.validations.append([has_string_pattern, "Name", "A.+"])
+    check2.validations.append(HasStrPattern("Name", "A.+"))
 
     # Create a pipeline
     pipeline = Pipeline(checks=[check1, check2])

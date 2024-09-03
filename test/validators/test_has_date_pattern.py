@@ -1,13 +1,13 @@
 import polars as pl
 
 from dqframework.pipeline import Pipeline, Check
-from dqframework.validators import has_date_pattern
+from dqframework.validators import HasDatePattern
 
 
 def test_has_date_pattern():
     pipeline = Pipeline(checks=[])
     check1 = Check(Check.Level.INFO, "Has Date Pattern")
-    check1.validations.append([has_date_pattern, "a", "%Y-%m-%d"])
+    check1.validations.append(HasDatePattern("a", "%Y-%m-%d"))
 
     pipeline.checks += [check1]
 
@@ -22,7 +22,7 @@ def test_has_date_pattern():
 def test_has_two_invalids():
     pipeline = Pipeline(checks=[])
     check1 = Check(Check.Level.INFO, "Has Date Pattern")
-    check1.validations.append([has_date_pattern, "a", "%Y-%m-%d"])
+    check1.validations.append(HasDatePattern("a", "%Y-%m-%d"))
 
     pipeline.checks += [check1]
 
