@@ -2,7 +2,7 @@ import datetime
 
 import polars as pl
 
-from dqframework.validators import no_future_dates
+from dqframework.validators import NoFutureDates
 
 
 def test_no_future_dates():
@@ -17,9 +17,8 @@ def test_no_future_dates():
         }
     )
 
-    correct, incorrect = no_future_dates(df, "a")
+    correct, incorrect = NoFutureDates("a").execute(df)
 
-    assert correct.shape[0] == 3
     assert correct.height == 3
 
     assert incorrect.shape[0] == 0
@@ -37,7 +36,7 @@ def test_no_future_dates_with_some_corrects():
         }
     )
 
-    correct, incorrect = no_future_dates(df, "a")
+    correct, incorrect = NoFutureDates("a").execute(df)
 
     assert correct.height == 2
     assert incorrect.height == 1
@@ -55,7 +54,7 @@ def test_no_future_dates_with_all_incorrect():
         }
     )
 
-    correct, incorrect = no_future_dates(df, "a")
+    correct, incorrect = NoFutureDates("a").execute(df)
 
     assert correct.height == 0
     assert incorrect.height == 3

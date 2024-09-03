@@ -6,6 +6,8 @@ from typing import List
 
 import polars as pl
 
+from dqframework.validators import Validator
+
 columns = [
     "id"
     "check_id"
@@ -37,7 +39,7 @@ class Check:
     ):
         self.level = level
         self.check_name: str = check_name
-        self.validations = []
+        self.validations: list[Validator] = []
         self.pass_threshold = pass_threshold
         self.check_id = str(uuid.uuid4())
 
@@ -46,16 +48,16 @@ class Check:
     ) -> (pl.DataFrame, pl.DataFrame, pl.DataFrame):
         if not self.validations:
             raise ValueError("No validations added to the check")
-        correct_acc = df
+        correct_acc = pl.DataFrame()
         incorrect_acc = pl.DataFrame()
 
         dq_metrics = pl.DataFrame()
         for validation in self.validations:
             val_id = str(uuid.uuid4())
-            rule = validation[0]
-            column = validation[1]
+            rule = validation.__class__.__name__
+            column = validation.column
 
-            correct, incorrect = rule(correct_acc, *validation[1:])
+            correct, incorrect = validation.execute(df)
             correct_acc = correct
 
             # tag the incorrect with the check_id that failed
@@ -73,8 +75,8 @@ class Check:
                         df,
                         incorrect,
                         column,
-                        rule.__name__,
-                        str(*validation[2:]),
+                        rule,
+                        str(validation.get_value()),
                         str(val_id),
                     ),
                 ]
@@ -144,7 +146,7 @@ class Pipeline:
         self.results = results_df
         self.status = Pipeline.Status.EXECUTED
 
-        return PipelineResults(aux_df, invalid_records, results_df)
+        return PipelineResults(df, aux_df, invalid_records, results_df)
 
     def results_to_csv(self, path: str):
         if self.status == Pipeline.Status.NOT_EXECUTED:
@@ -167,6 +169,7 @@ class Pipeline:
 
 @dataclass
 class PipelineResults:
+    original_records: pl.DataFrame
     valid_records: pl.DataFrame
     invalid_records: pl.DataFrame
     results: pl.DataFrame

@@ -1,13 +1,13 @@
 import polars as pl
 
 from dqframework.pipeline import Check, Pipeline
-from dqframework.validators import is_unique
+from dqframework.validators import IsUnique
 
 
 def test_is_unique():
     df = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
 
-    correct, incorrect = is_unique(df, "a")
+    correct, incorrect = IsUnique("a").execute(df)
 
     assert correct.shape[0] == 3
     assert correct.height == 3
@@ -18,7 +18,7 @@ def test_is_unique():
 def test_is_unique_with_some_corrects():
     df = pl.DataFrame({"a": [1, 2, 2], "b": [4, 5, 6]})
 
-    correct, incorrect = is_unique(df, "a")
+    correct, incorrect = IsUnique("a").execute(df)
 
     assert correct.height == 1
     assert incorrect.height == 2
@@ -27,7 +27,7 @@ def test_is_unique_with_some_corrects():
 def test_is_unique_with_no_corrects():
     df = pl.DataFrame({"a": [1, 1, 1], "b": [4, 5, 6]})
 
-    correct, incorrect = is_unique(df, "a")
+    correct, incorrect = IsUnique("a").execute(df)
 
     assert correct.height == 0
     assert incorrect.height == 3
@@ -38,7 +38,7 @@ def test_is_unique_in_a_pipeline():
 
     check = Check(Check.Level.INFO, "Is Unique")
 
-    check.validations.append([is_unique, "a"])
+    check.validations.append(IsUnique("a"))
 
     pipeline = Pipeline(checks=[check])
     pipeline_results = pipeline.execute(df)
