@@ -1,7 +1,5 @@
-from .average_check import CheckOperator
 from .base_validator import Validator
 from .base_validator import Validator
-from .check_operators import CheckOperator
 from .has_between import HasBetween
 from .has_between import HasBetween
 from .has_date_pattern import HasDatePattern
@@ -21,7 +19,6 @@ from .no_future_dates import NoFutureDates
 __all__ = [
     "HasBetween",
     "Validator",
-    "CheckOperator",
     "HasDatePattern",
     "HasMax",
     "HasMin",
