@@ -26,6 +26,17 @@ columns = [
 
 
 class Check:
+    """
+    Check class is responsible for executing the validations and returning the results
+
+    Args:
+        level (Check.Level): The level of the check
+            if the level is INFO or WARNING, the check will only log the results but won't filter them out from the results
+            if the level is ERROR or CRITICAL, the check will filter out the incorrect records from the results
+        check_name (str): The name of the check
+        pass_threshold (float): The threshold for the check to pass (default is 0.9)
+    """
+
     class Level(enum.Enum):
         INFO = "INFO"
         WARNING = "WARNING"
@@ -44,7 +55,9 @@ class Check:
         self.pass_threshold = pass_threshold
         self.check_id = str(uuid.uuid4())
 
-        self.filter_out = True if self.level in [Check.Level.ERROR, Check.Level.CRITICAL] else False
+        self.filter_out = (
+            True if self.level in [Check.Level.ERROR, Check.Level.CRITICAL] else False
+        )
 
     def __call__(
         self, df: pl.DataFrame, *args, **kwargs
@@ -74,7 +87,7 @@ class Check:
             dq_metrics = pl.concat(
                 [
                     dq_metrics,
-                    self.calculate_dq(
+                    self._calculate_dq(
                         df,
                         incorrect,
                         column,
@@ -91,7 +104,7 @@ class Check:
             incorrect_acc,
         )
 
-    def calculate_dq(
+    def _calculate_dq(
         self,
         original_df: pl.DataFrame,
         incorrect_df: pl.DataFrame,
@@ -123,6 +136,13 @@ class Check:
 
 
 class Pipeline:
+    """
+    Pipeline class is responsible for executing the checks and returning the results
+
+    Args:
+        checks (List[Check]): The list of checks to be executed in the pipeline
+    """
+
     class Status(enum.Enum):
         NOT_EXECUTED = "NOT_EXECUTED"
         EXECUTED = "EXECUTED"
@@ -133,6 +153,12 @@ class Pipeline:
         self.status = Pipeline.Status.NOT_EXECUTED
 
     def execute(self, df: pl.DataFrame):
+        """
+        Execute the pipeline
+
+        :param df: The DataFrame to be validated
+        :return: PipelineResults
+        """
         if not self.checks:
             raise ValueError("No checks added to the pipeline")
 
@@ -152,12 +178,25 @@ class Pipeline:
         return PipelineResults(df, aux_df, invalid_records, results_df)
 
     def results_to_csv(self, path: str):
+        """
+        Write the results to a CSV file (in path)
+
+        :param path: The path to the CSV file
+        :return: None
+        """
+
         if self.status == Pipeline.Status.NOT_EXECUTED:
             raise ValueError("Pipeline not executed")
 
         self.results.write_csv(path)
 
     def results_to_xlsx(self, path: str):
+        """
+        Write the results to an Excel file (in path)
+
+        :param path: The path to the Excel file
+        :return: None
+        """
         if self.status == Pipeline.Status.NOT_EXECUTED:
             raise ValueError("Pipeline not executed")
 
@@ -172,6 +211,10 @@ class Pipeline:
 
 @dataclass
 class PipelineResults:
+    """
+    PipelineResults class is responsible for storing the results of the pipeline execution
+    """
+
     original_records: pl.DataFrame
     valid_records: pl.DataFrame
     invalid_records: pl.DataFrame
