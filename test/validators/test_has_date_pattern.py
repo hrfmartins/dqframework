@@ -21,7 +21,7 @@ def test_has_date_pattern():
 
 def test_has_two_invalids():
     pipeline = Pipeline(checks=[])
-    check1 = Check(Check.Level.INFO, "Has Date Pattern")
+    check1 = Check(Check.Level.ERROR, "Has Date Pattern")
     check1.validations.append(HasDatePattern("a", "%Y-%m-%d"))
 
     pipeline.checks += [check1]
