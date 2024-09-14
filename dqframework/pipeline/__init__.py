@@ -30,6 +30,7 @@ class Check:
         INFO = "INFO"
         WARNING = "WARNING"
         ERROR = "ERROR"
+        CRITICAL = "CRITICAL"
 
     def __init__(
         self,
@@ -42,6 +43,8 @@ class Check:
         self.validations: list[Validator] = []
         self.pass_threshold = pass_threshold
         self.check_id = str(uuid.uuid4())
+
+        self.filter_out = True if self.level in [Check.Level.ERROR, Check.Level.CRITICAL] else False
 
     def __call__(
         self, df: pl.DataFrame, *args, **kwargs
@@ -58,7 +61,7 @@ class Check:
             column = validation.column
 
             correct, incorrect = validation.execute(df)
-            correct_acc = correct
+            correct_acc = correct if self.filter_out else df
 
             # tag the incorrect with the check_id that failed
             incorrect = incorrect.with_columns(
