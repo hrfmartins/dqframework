@@ -2,7 +2,7 @@
 name = "dqframework"
 version = "0.5.0"
 authors = [
-    { name = "Hugo Martins", email = "hrfmartins@gmail.com" },
+    { name = "Hugo Martins", email = "hugo.martins365@gmail.com" },
 ]
 description = "A dq framework"
 readme = "README.md"
