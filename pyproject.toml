@@ -1,6 +1,6 @@
 [project]
 name = "dqframework"
-version = "0.5.0"
+version = "0.6.0"
 authors = [
     { name = "Hugo Martins", email = "hugo.martins365@gmail.com" },
 ]
