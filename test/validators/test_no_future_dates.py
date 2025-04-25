@@ -29,7 +29,7 @@ def test_no_future_dates_with_some_corrects():
         {
             "a": [
                 datetime.datetime.strptime("2022-01-01", "%Y-%m-%d"),
-                datetime.datetime.strptime("2024-12-01", "%Y-%m-%d"),
+                datetime.datetime.strptime("3000-12-01", "%Y-%m-%d"),
                 datetime.datetime.strptime("2021-01-01", "%Y-%m-%d"),
             ],
             "b": [4, 5, 6],
@@ -46,9 +46,9 @@ def test_no_future_dates_with_all_incorrect():
     df = pl.DataFrame(
         {
             "a": [
-                datetime.datetime.strptime("2025-01-01", "%Y-%m-%d"),
-                datetime.datetime.strptime("2025-01-01", "%Y-%m-%d"),
-                datetime.datetime.strptime("2025-01-01", "%Y-%m-%d"),
+                datetime.datetime.strptime("2050-01-01", "%Y-%m-%d"),
+                datetime.datetime.strptime("2050-01-01", "%Y-%m-%d"),
+                datetime.datetime.strptime("2050-01-01", "%Y-%m-%d"),
             ],
             "b": [4, 5, 6],
         }

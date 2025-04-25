@@ -1,9 +1,11 @@
 from .base_validator import Validator
 from .base_validator import Validator
+from .comparisons_operator import ComparisonsOperator
 from .has_between import HasBetween
 from .has_between import HasBetween
 from .has_date_pattern import HasDatePattern
 from .has_max import HasMax
+from .has_mean import HasMean
 from .has_min import HasMin
 from .has_str_length import HasStrLength
 from .has_str_length_between import HasStrLengthBetween
@@ -32,4 +34,6 @@ __all__ = [
     "IsIn",
     "IsUnique",
     "NoFutureDates",
+    "ComparisonsOperator",
+    "HasMean",
 ]
