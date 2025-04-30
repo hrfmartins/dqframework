@@ -66,3 +66,19 @@ def test_pipeline_with_critical_level(test_dataframe):
     assert results.results.to_dicts()[0]["status"] == "FAIL"
     assert results.results.to_dicts()[0]["violations"] == 2
     assert results.results.to_dicts()[0]["pass_rate"] == 1 / 2
+
+
+def test_pipeline_with_error_and_info(test_dataframe):
+    check1 = Check(Check.Level.CRITICAL, "Check With critical level")
+    check1.validations = [HasMax("age", 25)]
+
+    check2 = Check(Check.Level.ERROR, "Check With Error Level")
+    check2.validations = [HasMax("age", 25)]
+
+    check3 = Check(Check.Level.INFO, "Check With INFO Level")
+    check3.validations = [HasMax("age", 25)]
+    pipeline = Pipeline(checks=[check1, check2])
+
+    results = pipeline.execute(test_dataframe)
+
+    assert results.valid_records.height == 2

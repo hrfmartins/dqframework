@@ -9,7 +9,7 @@ class HasBetween(Validator):
         self.min_value = min_value
         self.max_value = max_value
 
-    def validate(self, df: pl.DataFrame) -> (pl.DataFrame, pl.DataFrame):
+    def execute(self, df: pl.DataFrame) -> (pl.DataFrame, pl.DataFrame):
         correct = df.filter(
             (pl.col(self.column) >= self.min_value)
             & (pl.col(self.column) <= self.max_value)

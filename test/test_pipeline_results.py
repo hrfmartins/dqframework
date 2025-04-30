@@ -3,7 +3,7 @@ from datetime import timedelta
 import polars as pl
 
 from dqframework.pipeline import Pipeline, Check
-from dqframework.validators import HasMin
+from dqframework.validators import HasMin, HasBetween, IsComplete
 
 
 def test_pipeline_results():
@@ -105,6 +105,32 @@ def test_pipeline_check_with_multiple_validations():
     assert results["pass_rate"][1] == 1
     assert results["level"][1] == "INFO"
     assert results["column"][1] == "b"
+
+
+def test_pipeline_check_with_multiple_has_between_in_the_same_check():
+    check1 = Check(Check.Level.ERROR, "Has Minimum Value 2 and 4")
+    check1.validations.append(HasBetween("a", 2, 2))
+    check1.validations.append(HasBetween("b", 4, 4))
+
+    pipeline = Pipeline([check1])
+
+    pipeline_results = pipeline.execute(pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]}))
+
+    assert pipeline_results.valid_records.height == 0
+
+
+def test_pipeline_with_multiple_completeness():
+    check1 = Check(Check.Level.ERROR, "Has Minimum Value 2 and 4")
+    check1.validations.append(IsComplete("a"))
+    check1.validations.append(IsComplete("b"))
+
+    pipeline = Pipeline([check1])
+
+    pipeline_results = pipeline.execute(
+        pl.DataFrame({"a": ["a", None, "b"], "b": [None, "a", "b"]})
+    )
+
+    assert pipeline_results.valid_records.height == 1
 
 
 def test_pipeline_with_initial_records_return():
